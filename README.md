@@ -1,5 +1,10 @@
 # BioAI FieldNotes
 
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-local%20dashboard-009688)
+![Status](https://img.shields.io/badge/Status-MVP-orange)
+![Local First](https://img.shields.io/badge/Local--first-single%20user-4b5563)
+
 BioAI FieldNotes is a local single-user dashboard for on-demand 7-day scans
 across X. It collects posts, selects story clusters that look like concrete
 use cases rather than generic keyword mentions, ranks them with relative
