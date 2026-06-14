@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Run #{{ run["id"] }}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Run #{{ run["id"] }}</p>
+    <h1>{{ run["topic"] }}</h1>
+  </div>
+  <div class="report-actions">
+    <a class="button-link secondary" href="/reports/{{ run['id'] }}">Field brief</a>
+    <span class="status large">{{ run["status"] }}</span>
+  </div>
+</section>
+
+<section class="metric-grid">
+  {% set source_status = row_json(run, "source_status_json", {}) %}
+  {% for platform, status in source_status.items() %}
+  <div class="metric">
+    <span>{{ platform }}</span>
+    <strong>{{ status.get("fetched_count", 0) }}</strong>
+    <small>
+      {{ status.get("error") or "ok" }}
+      {% if status.get("fallback_triggered") %}
+        · adaptive story pass
+      {% endif %}
+    </small>
+  </div>
+  {% endfor %}
+  <div class="metric">
+    <span>Clusters</span>
+    <strong>{{ clusters|length }}</strong>
+    <small>ranked stories</small>
+  </div>
+</section>
+
+{% set errors = row_json(run, "errors_json", []) %}
+{% if errors %}
+<div class="notice warning">
+  {% for error in errors %}<div>{{ error }}</div>{% endfor %}
+</div>
+{% endif %}
+
+{% for platform, status in source_status.items() %}
+  {% if status.get("fallback_triggered") %}
+  <div class="notice">
+    <strong>{{ platform }} adaptive pass:</strong> {{ status.get("fallback_reason") }}
+  </div>
+  {% endif %}
+{% endfor %}
+
+{% set query_plan = row_json(run, "query_plan_json", {}) %}
+{% if query_plan %}
+<section class="section-band">
+  <div class="section-title">
+    <h2>Generated query plan</h2>
+    <span class="status">{{ query_plan.get("status", "unknown") }}</span>
+  </div>
+  <p><strong>Keywords:</strong> {{ ", ".join(query_plan.get("keywords", [])) }}</p>
+  {% if query_plan.get("story_goal") %}
+  <p><strong>Story goal:</strong> {{ query_plan.get("story_goal") }}</p>
+  {% endif %}
+  {% if query_plan.get("target_terms") %}
+  <p><strong>Target terms:</strong> {{ ", ".join(query_plan.get("target_terms", [])) }}</p>
+  {% endif %}
+  {% if query_plan.get("context_terms") %}
+  <p><strong>Context terms:</strong> {{ ", ".join(query_plan.get("context_terms", [])) }}</p>
+  {% endif %}
+  {% if query_plan.get("usage_cues") %}
+  <p><strong>Usage cues:</strong> {{ ", ".join(query_plan.get("usage_cues", [])) }}</p>
+  {% endif %}
+  {% if query_plan.get("exclusions") %}
+  <p><strong>Exclusions:</strong> {{ ", ".join(query_plan.get("exclusions", [])) }}</p>
+  {% endif %}
+  {% if query_plan.get("trusted_handles") %}
+  <p><strong>Trusted handles:</strong> {{ ", ".join(query_plan.get("trusted_handles", [])) }}</p>
+  {% endif %}
+  {% if query_plan.get("notes") %}
+  <p class="empty">{{ query_plan.get("notes") }}</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="section-band">
+  <div class="section-title">
+    <h2>Ranked stories</h2>
+  </div>
+  {% if clusters %}
+  <div class="cluster-list">
+    {% for cluster in clusters %}
+    {% set metrics = row_json(cluster, "metrics_json", {}) %}
+    <a class="cluster-row" href="/clusters/{{ cluster['id'] }}">
+      <div>
+        <strong>{{ cluster["title"] }}</strong>
+        <p>
+          {{ metrics.get("post_count", 0) }} post(s),
+          {{ metrics.get("unique_author_count") or metrics.get("post_count", 0) }} author(s),
+          engagement {{ metrics.get("total_engagement", 0) }},
+          story fit {{ "%.0f"|format((metrics.get("max_story_fit", 0)|float) * 100) }},
+          {{ metrics.get("selection_label", "unknown").replace("_", " ") }},
+          sentiment {{ metrics.get("sentiment_label", "neutral") }}
+        </p>
+      </div>
+      <div class="score">{{ "%.0f"|format(cluster["score"] * 100) }}</div>
+      <span class="status">{{ cluster["summary_status"] }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">No clusters found.</p>
+  {% endif %}
+</section>
+{% endblock %}

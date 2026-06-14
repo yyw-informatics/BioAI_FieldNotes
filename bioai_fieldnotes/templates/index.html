@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}BioAI FieldNotes{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Workflow</p>
+    <h1>Choose a review mode</h1>
+  </div>
+</section>
+
+<section class="mode-grid">
+  <a class="mode-card active" href="/scan">
+    <span class="mode-kicker">Available now</span>
+    <h2>7-day scan</h2>
+    <p>Search X, rank story clusters, and summarize the highest-signal threads.</p>
+  </a>
+  <div class="mode-card disabled" aria-disabled="true">
+    <span class="mode-kicker">Coming later</span>
+    <h2>Recurring review</h2>
+    <p>Scheduled longitudinal scans with trend memory, drift, and review cadence controls.</p>
+  </div>
+</section>
+
+<section class="section-band">
+  <div class="section-title">
+    <h2>Recent runs</h2>
+    <a href="/runs">View all</a>
+  </div>
+  {% if runs %}
+  <div class="run-list">
+    {% for run in runs %}
+    <a class="run-row" href="/runs/{{ run['id'] }}">
+      <span class="run-topic">{{ run["topic"] }}</span>
+      <span>{{ run["status"] }}</span>
+      <span>{{ run["created_at"][:19].replace("T", " ") }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">No scans yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

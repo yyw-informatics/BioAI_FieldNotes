@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ report_title }}{% endblock %}
+{% block body_class %}report-body{% endblock %}
+{% block content %}
+<article class="report-page art-brief">
+  <section class="report-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">BioAI Field Brief · Run #{{ run["id"] }}</p>
+      <h1>{{ report_title }}</h1>
+      <div class="hero-meta">
+        <span>Platform <strong>{{ platform_label }}</strong></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="brief-overview" aria-label="Scan overview">
+    <div class="brief-stat-grid">
+      <div class="brief-stat-card mint">
+        <span>Posts Scanned</span>
+        <strong>{{ posts_scanned }}</strong>
+      </div>
+      <div class="brief-stat-card coral">
+        <span>Unique Stories</span>
+        <strong>{{ unique_stories }}</strong>
+      </div>
+      <div class="brief-stat-card sky">
+        <span>Authors</span>
+        <strong>{{ unique_authors }}</strong>
+      </div>
+      <div class="brief-stat-card gold">
+        <span>Scan Date</span>
+        <strong>{{ report_day }}</strong>
+      </div>
+    </div>
+  </section>
+
+  {% if report_summary %}
+  <section class="report-synthesis" aria-label="Report synthesis">
+    <p class="eyebrow">Synthesis</p>
+    <h2>{{ report_summary.heading }}</h2>
+    <p>{{ report_summary.body }}</p>
+    <ul>
+      {% for bullet in report_summary.bullets %}
+      <li>{{ bullet }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% for section in sections %}
+  <section class="report-section {{ section.meta.tone }}">
+    <aside class="category-panel">
+      {% if section.meta.emoji %}
+      <div class="category-mark">{{ section.meta.emoji }}</div>
+      {% endif %}
+      <p class="eyebrow">{{ section.count }} {{ "story" if section.count == 1 else "stories" }}</p>
+      <h2>{{ section.meta.section }}</h2>
+    </aside>
+    <div class="story-button-stack">
+      {% for story in section.stories %}
+      <a class="story-button {{ story.sentiment_meta.tone }}" href="{{ story.source_url or story.href }}" target="_blank" rel="noopener noreferrer">
+        <span class="story-summary-text">{{ story.one_liner }}</span>
+        <span class="story-summary-meta">engagement {{ story.engagement_label }} · fit {{ "%.0f"|format(story.story_fit * 100) }}%</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <section class="report-method">
+    <details>
+      <summary>Technical Notes</summary>
+      <div class="method-grid">
+        <div>
+          <h3>Metric Definitions</h3>
+          <p><strong>Engagement:</strong> likes + replies + 2× reposts + 1.5× quotes, summed across deduplicated versions of the story.</p>
+          <p><strong>Story fit:</strong> a 0-100 score from target-model matches, first-person usage cues, task/outcome terms, domain context, visual demo evidence from X media metadata, and penalties for announcement-only or meta posts.</p>
+          <p><strong>Deduplication:</strong> stories are merged by shared external links first, then near-duplicate text. Generic X/Twitter status links are ignored as dedupe keys.</p>
+        </div>
+      </div>
+      <div class="method-grid">
+        <div>
+          <h3>Query Plan</h3>
+          <p><strong>Targets:</strong> {{ ", ".join(query_plan.get("target_terms", [])) }}</p>
+          <p><strong>Context:</strong> {{ ", ".join(query_plan.get("context_terms", [])) }}</p>
+          <p><strong>Usage cues:</strong> {{ ", ".join(query_plan.get("usage_cues", [])) }}</p>
+        </div>
+      </div>
+    </details>
+  </section>
+</article>
+{% endblock %}

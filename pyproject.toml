@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bioai-fieldnotes"
+version = "0.1.0"
+description = "Local dashboard for 7-day AI and bioinformatics social trend scans."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+bioai = "bioai_fieldnotes.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bioai_fieldnotes*"]
+
+[tool.setuptools.package-data]
+bioai_fieldnotes = [
+    "templates/*.html",
+    "static/*.css",
+]

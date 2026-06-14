@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Cost ledger{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Costs</p>
+    <h1>Cost ledger</h1>
+  </div>
+  <div class="metric compact">
+    <span>Estimated</span>
+    <strong>${{ "%.4f"|format(total_estimated) }}</strong>
+  </div>
+</section>
+
+{% if events %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Run</th>
+        <th>Status</th>
+        <th>Model</th>
+        <th>Input</th>
+        <th>Output</th>
+        <th>Estimate</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      <tr>
+        <td><a href="/runs/{{ event['run_id'] }}">#{{ event["run_id"] }}</a></td>
+        <td><span class="status">{{ event["status"] }}</span></td>
+        <td>{{ event["provider"] }} / {{ event["model"] }}</td>
+        <td>{{ event["input_tokens"] }}</td>
+        <td>{{ event["output_tokens"] }}</td>
+        <td>${{ "%.5f"|format(event["estimated_cost_usd"]) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty">No cost events yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Run history{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">History</p>
+    <h1>Scan runs</h1>
+  </div>
+  <a class="button-link" href="/scan">New scan</a>
+</section>
+
+{% if runs %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Run</th>
+        <th>Topic</th>
+        <th>Status</th>
+        <th>Platforms</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for run in runs %}
+      <tr>
+        <td><a href="/runs/{{ run['id'] }}">#{{ run["id"] }}</a></td>
+        <td>{{ run["topic"] }}</td>
+        <td><span class="status">{{ run["status"] }}</span></td>
+        <td>{{ ", ".join(row_json(run, "platforms_json", [])) }}</td>
+        <td>{{ run["created_at"][:19].replace("T", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty">No scans yet.</p>
+{% endif %}
+{% endblock %}

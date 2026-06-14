@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}BioAI FieldNotes{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}?v=20260611-report-22">
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
+    <header class="topbar">
+      <a class="brand" href="/">BioAI FieldNotes</a>
+      <nav>
+        <a href="/scan">7-day scan</a>
+        <a href="/runs">Run history</a>
+        <a href="/costs">Costs</a>
+      </nav>
+    </header>
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

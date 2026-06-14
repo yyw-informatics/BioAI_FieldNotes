@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ cluster["title"] }}{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Story cluster</p>
+    <h1>{{ cluster["title"] }}</h1>
+  </div>
+  <div class="score big">{{ "%.0f"|format(cluster["score"] * 100) }}</div>
+</section>
+
+<section class="metric-grid">
+  <div class="metric">
+    <span>Posts</span>
+    <strong>{{ metrics.get("post_count", posts|length) }}</strong>
+    <small>merged versions</small>
+  </div>
+  <div class="metric">
+    <span>Authors</span>
+    <strong>{{ metrics.get("unique_author_count") or metrics.get("post_count", posts|length) }}</strong>
+    <small>unique handles</small>
+  </div>
+  <div class="metric">
+    <span>Engagement</span>
+    <strong>{{ metrics.get("total_engagement", 0) }}</strong>
+    <small>weighted total</small>
+  </div>
+  <div class="metric">
+    <span>Author reach</span>
+    <strong>{{ metrics.get("max_author_followers", 0) }}</strong>
+    <small>max followers</small>
+  </div>
+  <div class="metric">
+    <span>Story fit</span>
+    <strong>{{ "%.0f"|format((metrics.get("max_story_fit", 0)|float) * 100) }}</strong>
+    <small>{{ metrics.get("selection_label", "unknown").replace("_", " ") }}</small>
+  </div>
+  <div class="metric">
+    <span>Sentiment</span>
+    <strong>{{ metrics.get("sentiment_label", "neutral") }}</strong>
+    <small>{{ "%.2f"|format(metrics.get("sentiment_score", 0)|float) }}</small>
+  </div>
+</section>
+
+<section class="section-band">
+  <div class="section-title">
+    <h2>Summary</h2>
+    <span class="status">{{ cluster["summary_status"] }}</span>
+  </div>
+  {% if cluster["summary"] %}
+  <pre class="summary">{{ cluster["summary"] }}</pre>
+  {% else %}
+  <p class="empty">{{ cluster["caveats"] or "No summary generated." }}</p>
+  {% endif %}
+  {% if cluster["caveats"] %}
+  <div class="notice">{{ cluster["caveats"] }}</div>
+  {% endif %}
+</section>
+
+<section class="section-band">
+  <div class="section-title">
+    <h2>Representative posts</h2>
+  </div>
+  <div class="post-list">
+    {% for post in posts %}
+    <article class="post-card">
+      {% set parts = row_json(post, "score_parts_json", {}) %}
+      <header>
+        <strong>@{{ post["author_handle"] }}</strong>
+        <span>{{ post["platform"] }}</span>
+      </header>
+      <p>{{ post["text"] }}</p>
+      <footer>
+        <span>likes {{ post["like_count"] }}</span>
+        <span>reposts {{ post["repost_count"] }}</span>
+        <span>replies {{ post["reply_count"] }}</span>
+        <span>quotes {{ post["quote_count"] }}</span>
+        <span>story fit {{ "%.0f"|format((parts.get("story_fit", 0)|float) * 100) }}</span>
+        <span>{{ parts.get("selection_label", "unknown").replace("_", " ") }}</span>
+        <span>sentiment {{ parts.get("sentiment_label", "neutral") }}</span>
+        <a href="{{ post['url'] }}">Open</a>
+      </footer>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

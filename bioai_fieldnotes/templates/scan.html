@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Start 7-day scan{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">7-day scan</p>
+    <h1>Scan X</h1>
+  </div>
+</section>
+
+{% if error %}
+<div class="notice error">{{ error }}</div>
+{% endif %}
+
+<div class="notice">
+  <strong>X API key:</strong>
+  {% if runtime_status.x_bearer_token %}
+    configured.
+  {% else %}
+    missing. Add <code>X_BEARER_TOKEN</code> to <code>.env</code> or export it before starting the app.
+  {% endif %}
+  <br>
+  <strong>OpenAI key:</strong>
+  {% if runtime_status.openai_api_key %}
+    configured.
+  {% else %}
+    missing; summaries will use extractive previews or be skipped.
+  {% endif %}
+  <br>
+  <strong>Pricing:</strong>
+  {% if runtime_status.modelprices %}
+    configured.
+  {% else %}
+    not configured; LLM summaries are blocked unless dev fallback pricing is enabled.
+  {% endif %}
+</div>
+
+<form class="scan-form" method="post" action="/scan">
+  <div class="form-grid">
+    <label>
+      <span>Research request</span>
+      <textarea name="prompt" required rows="6" placeholder="I want to find 10 to 15 interesting anecdotes about people using Claude's most recent models, Mythos and/or Fable. Prioritize stories related to biomedical research, science, and public health."></textarea>
+    </label>
+    <label>
+      <span>Topic label</span>
+      <input name="topic" placeholder="Claude model anecdotes in science">
+    </label>
+    <label>
+      <span>Optional seed keywords</span>
+      <textarea name="keywords" rows="3" placeholder="Claude Mythos, Claude Fable, biomedical research"></textarea>
+    </label>
+    <label>
+      <span>Optional excluded terms</span>
+      <textarea name="exclusions" rows="3" placeholder="course, job posting"></textarea>
+    </label>
+    <label>
+      <span>Optional trusted handles</span>
+      <textarea name="trusted_handles" rows="3" placeholder="naturemethods, biorxivpreprint"></textarea>
+    </label>
+  </div>
+
+  <div class="control-strip">
+    <fieldset>
+      <legend>Platforms</legend>
+      <label class="check"><input type="checkbox" name="platforms" value="x" checked> X</label>
+    </fieldset>
+    <label>
+      <span>Posts/source</span>
+      <input type="number" name="max_posts_per_source" value="100" min="10" max="500">
+    </label>
+    <label>
+      <span>Summaries</span>
+      <input type="number" name="max_summaries" value="15" min="0" max="25">
+    </label>
+    <label>
+      <span>Budget cap</span>
+      <input type="number" name="max_estimated_cost_usd" value="1.00" min="0" step="0.01">
+    </label>
+    <label class="check fallback">
+      <input type="checkbox" name="allow_fallback_pricing" value="1">
+      Dev fallback pricing
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit">Start scan</button>
+  </div>
+</form>
+{% endblock %}
